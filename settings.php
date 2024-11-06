@@ -22,17 +22,17 @@ if ($hassiteconfig) {
 
     $ADMIN->add('localplugins', $settings);
 
-    defined('MOODLE_INTERNAL') || die();
-
     require_once(__DIR__.'/lib.php');
 
     // Подключение обработчика к форме курса.
     $settings->add(new admin_setting_configcheckbox(
-        'local_open_course_materials/enableopenaccess',
-        get_string('enableopenaccess', 'local_open_course_materials'),
-        get_string('enableopenaccess_desc', 'local_open_course_materials'),
+        'local_open_course_materials/open_access_days',
+        get_string('open_access_days', 'local_open_course_materials'),
+        get_string('open_access_days_desc', 'local_open_course_materials'),
         0
     ));
+
+    $CFG->extend_course_edit_form = 'local_open_course_materials_extend_course_edit_form';
 
 }
 
