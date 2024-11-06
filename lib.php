@@ -58,3 +58,35 @@ function local_open_course_materials_can_access_module($courseid, $moduleid) {
     $module_availability_date = strtotime("+{$module_access_days} days", $user_course_registration_date);
     return time() >= $module_availability_date;
 }
+
+/**
+ * Добавляет настройку "Задержка открытия" в форму курса.
+ *
+ * @param moodleform $form
+ * @param stdClass $data
+ */
+function local_open_course_materials_extend_course_edit_form($form, $data) {
+    // Проверка, является ли форма объектом класса course_edit_form.
+    if ($form instanceof \core_course\edit_form) {
+        $mform = $form->_form;
+
+        // Добавляем текстовое поле для указания задержки открытия курса.
+        $mform->addElement('text', 'open_access_days', get_string('open_access_days', 'local_open_course_materials'), ['size' => '4']);
+        $mform->setType('open_access_days', PARAM_INT);
+        $mform->setDefault('open_access_days', 0); // По умолчанию 0 дней.
+        $mform->addRule('open_access_days', null, 'numeric', null, 'client');
+    }
+}
+
+function local_open_course_materials_after_course_updated($event) {
+    global $DB;
+
+    $data = $event->get_data();
+    $courseid = $data['courseid'];
+
+    // Проверяем наличие задержки открытия и обновляем запись.
+    if (isset($data['other']['open_access_days'])) {
+        $DB->set_field('course', 'open_access_days', $data['other']['open_access_days'], ['id' => $courseid]);
+    }
+}
+
