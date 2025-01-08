@@ -16,7 +16,7 @@ function local_open_course_materials_can_access_course($courseid) {
     // Индивидуальная задержка открытия курса.
     $course_access_days = $DB->get_field('course', 'open_access_days', ['id' => $courseid]);
     if ($course_access_days === null) {
-        $course_access_days = get_config('local_open_course_materials', 'course_access_days') ?? 7;
+        $course_access_days = get_config('local_open_courses_and_materials_individually', 'course_access_days') ?? 7;
     }
 
     // Вычисляем дату открытия курса.
@@ -51,7 +51,7 @@ function local_open_course_materials_can_access_module($courseid, $moduleid) {
     // Задержка открытия модуля.
     $module_access_days = $DB->get_field('course_modules', 'open_access_days', ['id' => $moduleid]);
     if ($module_access_days === null) {
-        $module_access_days = get_config('local_open_course_materials', 'module_access_days') ?? 3;
+        $module_access_days = get_config('local_open_courses_and_materials_individually', 'module_access_days') ?? 3;
     }
 
     // Вычисляем дату открытия модуля.
@@ -71,7 +71,7 @@ function local_open_course_materials_extend_course_edit_form($form, $data) {
         $mform = $form->_form;
 
         // Добавляем текстовое поле для указания задержки открытия курса.
-        $mform->addElement('text', 'open_access_days', get_string('open_access_days', 'local_open_course_materials'), ['size' => '4']);
+        $mform->addElement('text', 'open_access_days', get_string('open_access_days', 'local_open_courses_and_materials_individually'), ['size' => '4']);
         $mform->setType('open_access_days', PARAM_INT);
         $mform->setDefault('open_access_days', 0); // По умолчанию 0 дней.
         $mform->addRule('open_access_days', null, 'numeric', null, 'client');
