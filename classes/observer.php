@@ -9,8 +9,65 @@ use course_modinfo;
 use cache_helper;
 
 class observer {
-    // здесь будет handle_course_viewed
-    // ещё нужно реализовать update_section_visibility
+    public static function handle_course_viewed(course_viewed $event) {
+        global $DB, $USER;
+
+        if (!get_config('local_open_courses_and_materials_individually', 'enableplugin') ||
+            !get_config('local_open_courses_and_materials_individually', 'enabletopicdelay')) {
+            return;
+        }
+
+        $courseid = $event->courseid;
+        $topic_delay_days = get_config('local_open_courses_and_materials_individually', 'topicdelaydays');
+        
+        // получаем время регистрации на курс
+        $course_start = $DB->get_field_sql(
+            "SELECT MIN(ue.timestart)
+             FROM {user_enrolments} ue
+             JOIN {enrol} e ON e.id = ue.enrolid
+             WHERE e.courseid = ? AND ue.userid = ? AND ue.status = 0",
+            array($courseid, $USER->id)
+        );
+
+        if (!$course_start) {
+            return;
+        }
+
+        // получаем все темы курса
+        $sections = $DB->get_records('course_sections', ['course' => $courseid], 'section ASC');
+        
+        foreach ($sections as $section) {
+            if ($section->section == 0) {
+                // секция 0 курса всегда видима
+                self::update_section_visibility($section->id, true);
+                continue;
+            }
+
+            // вычисляем время начала видимости темы
+            $topic_delay = ($section->section - 1) * $topic_delay_days * 24 * 60 * 60;
+            $topic_visible_time = $course_start + $topic_delay;
+
+            // обновляем видимость темы
+            $should_be_visible = (time() >= $topic_visible_time);
+            self::update_section_visibility($section->id, $should_be_visible);
+        }
+    }
+    
+    private static function update_section_visibility($sectionid, $visible) {
+        global $DB;
+        
+        // получить id курса по id секции
+        $section = $DB->get_record('course_sections', array('id' => $sectionid), 'course');
+        
+        $DB->update_record('course_sections', (object)[
+            'id' => $sectionid,
+            'visible' => $visible ? 1 : 0
+        ]);
+
+        rebuild_course_cache($section->course, true);        
+        course_modinfo::clear_instance_cache($section->course);       
+        cache_helper::purge_by_event('changesinsection');
+    }
 
     public static function handle_user_enrolment(user_enrolment_created $event) {
         global $DB;
