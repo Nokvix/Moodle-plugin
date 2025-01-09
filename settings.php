@@ -1,39 +1,58 @@
 <?php
 defined('MOODLE_INTERNAL') || die();
 
-
-
+// Проверяем, есть ли права на просмотр настроек сайта:
 if ($hassiteconfig) {
-    $settings = new admin_settingpage('local_open_courses_and_materials_individually', get_string('pluginname', 'local_open_courses_and_materials_individually'));
 
-    $settings->add(new admin_setting_configtext(
-        'local_open_courses_and_materials_individually/course_access_days',
-        get_string('course_access_days', 'local_open_courses_and_materials_individually'),
-        get_string('course_access_days_desc', 'local_open_courses_and_materials_individually'),
-        7, PARAM_INT
-    ));
+    // Создаём страницу настроек локального плагина.
+    $settings = new admin_settingpage(
+        'local_open_courses_and_materials_individually',
+        get_string('pluginname', 'local_open_courses_and_materials_individually')
+    );
 
-    $settings->add(new admin_setting_configtext(
-        'local_open_courses_and_materials_individually/module_access_days',
-        get_string('module_access_days', 'local_open_courses_and_materials_individually'),
-        get_string('module_access_days_desc', 'local_open_courses_and_materials_individually'),
-        3, PARAM_INT
-    ));
-
-    $ADMIN->add('localplugins', $settings);
-
-    require_once(__DIR__.'/lib.php');
-
-    // Подключение обработчика к форме курса.
+    // Включить плагин
     $settings->add(new admin_setting_configcheckbox(
-        'local_open_courses_and_materials_individually/open_access_days',
-        get_string('open_access_days', 'local_open_courses_and_materials_individually'),
-        get_string('open_access_days_desc', 'local_open_courses_and_materials_individually'),
+        'local_open_courses_and_materials_individually/enableplugin',
+        get_string('enableplugin', 'local_open_courses_and_materials_individually'),
+        get_string('enableplugin_desc', 'local_open_courses_and_materials_individually'),
+        0 // Значение по умолчанию = выкл.
+    ));
+
+    // Задержка курсов в днях
+    $settings->add(new admin_setting_configtext(
+        'local_open_courses_and_materials_individually/delaydays',
+        get_string('delaydays', 'local_open_courses_and_materials_individually'),
+        get_string('delaydays_desc', 'local_open_courses_and_materials_individually'),
+        7, // по умолчанию
+        PARAM_INT
+    ));
+
+    // Пользовательское сообщение
+    $settings->add(new admin_setting_configtext(
+        'local_open_courses_and_materials_individually/custommessage',
+        get_string('custommessage', 'local_open_courses_and_materials_individually'),
+        get_string('custommessage_desc', 'local_open_courses_and_materials_individually'),
+        '', // по умолчанию пусто
+        PARAM_TEXT
+    ));
+
+    // Включить задержку тем
+    $settings->add(new admin_setting_configcheckbox(
+        'local_open_courses_and_materials_individually/enabletopicdelay',
+        get_string('enabletopicdelay', 'local_open_courses_and_materials_individually'),
+        get_string('enabletopicdelay_desc', 'local_open_courses_and_materials_individually'),
         0
     ));
 
-    $CFG->extend_course_edit_form = 'local_open_courses_and_materials_individually_extend_course_edit_form';
+    // Задержка тем в днях
+    $settings->add(new admin_setting_configtext(
+        'local_open_courses_and_materials_individually/topicdelaydays',
+        get_string('topicdelaydays', 'local_open_courses_and_materials_individually'),
+        get_string('topicdelaydays_desc', 'local_open_courses_and_materials_individually'),
+        7,
+        PARAM_INT
+    ));
 
+    // Регистрируем страницу настроек в разделе «Локальные плагины».
+    $ADMIN->add('localplugins', $settings);
 }
-
-
