@@ -2,91 +2,44 @@
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Проверяет доступ к курсу на основе даты регистрации на сайт.
+ * Фильтры курсов, доступных пользователю.
  *
- * @param int $courseid ID курса.
- * @return bool True, если доступ разрешен.
+ * @param array $courses
+ * @return array
  */
-function local_open_course_materials_can_access_course($courseid) {
-    global $USER, $DB;
+function local_open_courses_and_materials_individually_pre_get_enrolled_courses($courses) {
+    global $DB, $USER;
 
-    // Дата регистрации пользователя на сайте.
-    $user_registration_date = $DB->get_field('user', 'timecreated', ['id' => $USER->id]);
-
-    // Индивидуальная задержка открытия курса.
-    $course_access_days = $DB->get_field('course', 'open_access_days', ['id' => $courseid]);
-    if ($course_access_days === null) {
-        $course_access_days = get_config('local_open_courses_and_materials_individually', 'course_access_days') ?? 7;
+    if (!get_config('local_open_courses_and_materials_individually', 'enableplugin')) {
+        return $courses;
     }
 
-    // Вычисляем дату открытия курса.
-    $course_availability_date = strtotime("+{$course_access_days} days", $user_registration_date);
-    return time() >= $course_availability_date;
+    $current_time = time();
+    $filtered_courses = array();
+
+    foreach ($courses as $course) {
+        // Получить время начала курса
+        $timestart = $DB->get_field_sql(
+            "SELECT MIN(ue.timestart)
+             FROM {user_enrolments} ue
+             JOIN {enrol} e ON e.id = ue.enrolid
+             WHERE e.courseid = ? AND ue.userid = ? AND ue.status = 0",
+            array($course->id, $USER->id)
+        );
+
+        // Показывать только курсы, которые начались
+        if ($timestart && $current_time >= $timestart) {
+            $filtered_courses[] = $course;
+        }
+    }
+
+    return $filtered_courses;
 }
 
 /**
- * Проверяет доступ к модулю курса на основе даты регистрации на курс.
+ * Расширенная навигация по курсам.
  *
- * @param int $courseid ID курса.
- * @param int $moduleid ID модуля.
- * @return bool True, если доступ разрешен.
+ * @param \navigation_node $navigation
+ * @param \stdClass $course
+ * @param \context_course $context
  */
-function local_open_course_materials_can_access_module($courseid, $moduleid) {
-    global $USER, $DB;
-
-    // Дата регистрации пользователя на курс.
-    $enrolment_record = $DB->get_record_sql("
-        SELECT ue.timecreated
-        FROM {user_enrolments} ue
-        JOIN {enrol} e ON e.id = ue.enrolid
-        WHERE ue.userid = :userid AND e.courseid = :courseid
-    ", ['userid' => $USER->id, 'courseid' => $courseid]);
-
-    if (!$enrolment_record) {
-        return false; // Если пользователь не зарегистрирован на курс.
-    }
-
-    $user_course_registration_date = $enrolment_record->timecreated;
-
-    // Задержка открытия модуля.
-    $module_access_days = $DB->get_field('course_modules', 'open_access_days', ['id' => $moduleid]);
-    if ($module_access_days === null) {
-        $module_access_days = get_config('local_open_courses_and_materials_individually', 'module_access_days') ?? 3;
-    }
-
-    // Вычисляем дату открытия модуля.
-    $module_availability_date = strtotime("+{$module_access_days} days", $user_course_registration_date);
-    return time() >= $module_availability_date;
-}
-
-/**
- * Добавляет настройку "Задержка открытия" в форму курса.
- *
- * @param moodleform $form
- * @param stdClass $data
- */
-function local_open_course_materials_extend_course_edit_form($form, $data) {
-    // Проверка, является ли форма объектом класса course_edit_form.
-    if ($form instanceof \core_course\edit_form) {
-        $mform = $form->_form;
-
-        // Добавляем текстовое поле для указания задержки открытия курса.
-        $mform->addElement('text', 'open_access_days', get_string('open_access_days', 'local_open_courses_and_materials_individually'), ['size' => '4']);
-        $mform->setType('open_access_days', PARAM_INT);
-        $mform->setDefault('open_access_days', 0); // По умолчанию 0 дней.
-        $mform->addRule('open_access_days', null, 'numeric', null, 'client');
-    }
-}
-
-function local_open_course_materials_after_course_updated($event) {
-    global $DB;
-
-    $data = $event->get_data();
-    $courseid = $data['courseid'];
-
-    // Проверяем наличие задержки открытия и обновляем запись.
-    if (isset($data['other']['open_access_days'])) {
-        $DB->set_field('course', 'open_access_days', $data['other']['open_access_days'], ['id' => $courseid]);
-    }
-}
-
