@@ -1,12 +1,25 @@
 <?php
-defined('MOODLE_INTERNAL') || die();
+// This file is part of Moodle - http://moodle.org/.
+// Русский язык для плагина local_open_courses_and_materials_individually
 
-$string['pluginname'] = 'Открыть материалы курса';
-$string['course_access_days'] = 'Дни до доступа к курсу';
-$string['course_access_days_desc'] = 'Количество дней с момента регистрации пользователя до открытия доступа к курсу';
-$string['module_access_days'] = 'Дни до доступа к модулю';
-$string['module_access_days_desc'] = 'Количество дней с момента зачисления на курс до открытия доступа к модулю';
-$string['open_access_days'] = 'Дни до открытия курса';
-$string['open_access_days_desc'] = 'Укажите задержку в днях до того, как курс станет доступен для пользователя';
-$string['enableopenaccess'] = 'Включить задержку доступа к курсу';
-$string['enableopenaccess_desc'] = 'Включить или отключить опцию установки задержки перед доступом к материалам курса';
+$string['pluginname'] = 'Открытие курсов и материалов индивидуально';
+
+// Для чекбокса
+$string['enableplugin'] = 'Включить плагин';
+$string['enableplugin_desc'] = 'Если включено, плагин будет активен и выполнять свою логику';
+
+// Для задержки
+$string['delaydays'] = 'Задержка (дней)';
+$string['delaydays_desc'] = 'Введите, через сколько дней после регистрации/зачисления открываются материалы';
+
+// Текстовое поле (сообщение)
+$string['custommessage'] = 'Дополнительное сообщение';
+$string['custommessage_desc'] = 'Эта надпись может отображаться пользователям (или использоваться в логике плагина)';
+
+// Задержка показа тем
+$string['enabletopicdelay'] = 'Включить задержку тем';
+$string['enabletopicdelay_desc'] = 'Если включено, темы курса будут скрыты на указанное количество дней после зачисления';
+$string['topicdelaydays'] = 'Задержка тем (дней)';
+$string['topicdelaydays_desc'] = 'Количество дней ожидания перед показом тем курса';
+$string['topic_not_available_yet'] = 'Эта тема станет доступна позже';
+$string['strftimedatetime'] = '%d.%m.%Y %H:%M';
