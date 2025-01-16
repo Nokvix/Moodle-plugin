@@ -18,8 +18,8 @@ $string['custommessage_desc'] = 'Эта надпись может отображ
 
 // Задержка показа тем
 $string['enabletopicdelay'] = 'Включить задержку тем';
-$string['enabletopicdelay_desc'] = 'Если включено, темы курса будут скрыты на указанное количество дней после зачисления';
-$string['topicdelaydays'] = 'Задержка тем (дней)';
-$string['topicdelaydays_desc'] = 'Количество дней ожидания перед показом тем курса';
+$string['enabletopicdelay_desc'] = 'Если включено, темы курса будут скрыты на указанное в них количество дней после зачисления';
+$string['topicdelaydays'] = 'Задержка тем по-умолчанию (дней)';
+$string['topicdelaydays_desc'] = 'Количество дней ожидания перед показом тем курса по-умолчанию (если не изменено в теме)';
 $string['topic_not_available_yet'] = 'Эта тема станет доступна позже';
 $string['strftimedatetime'] = '%d.%m.%Y %H:%M';
