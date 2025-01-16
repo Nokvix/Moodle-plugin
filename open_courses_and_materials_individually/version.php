@@ -8,7 +8,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2024122037;  // Версия плагина.
+$plugin->version = 2025011644;  // Версия плагина.
 $plugin->release = '4.8.1-5 (2024042900 mdl-39)';    // Обновлённая версия и сборка плагина.
 $plugin->requires = 2019111200;     // Минимальная версия Moodle, например 3.9 (2019111800).
 $plugin->component = 'local_open_courses_and_materials_individually';

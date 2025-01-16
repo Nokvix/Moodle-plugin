@@ -18,8 +18,8 @@ $string['custommessage_desc'] = 'This text may be displayed to users (or used in
 
 // For the Topic delay (message)
 $string['enabletopicdelay'] = 'Enable topic delay';
-$string['enabletopicdelay_desc'] = 'If enabled, course topics will be hidden for specified number of days after enrollment';
-$string['topicdelaydays'] = 'Topic delay (days)';
-$string['topicdelaydays_desc'] = 'Number of days to wait before showing course topics';
+$string['enabletopicdelay_desc'] = 'If enabled, course topics will be hidden for specified number of days after for topic enrollment';
+$string['topicdelaydays'] = 'Topic delay by default (days)';
+$string['topicdelaydays_desc'] = 'Number of days to wait before showing course topics by default (if not changed in the topic)';
 $string['topic_not_available_yet'] = 'This topic will become available later';
 $string['strftimedatetime'] = '%d/%m/%Y %H:%M';

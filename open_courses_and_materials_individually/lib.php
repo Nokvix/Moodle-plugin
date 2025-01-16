@@ -35,11 +35,3 @@ function local_open_courses_and_materials_individually_pre_get_enrolled_courses(
 
     return $filtered_courses;
 }
-
-/**
- * Расширенная навигация по курсам.
- *
- * @param \navigation_node $navigation
- * @param \stdClass $course
- * @param \context_course $context
- */
